@@ -1,0 +1,17 @@
+#Overlapping of the bed generated previously using bedtools intersect function
+#https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html
+#Done using  UNIX command line
+
+##################
+#### HUMAN #######
+##################
+bedtools intersect -a wgEncodeGencodeComprehensiveV36lift37_fileforhost_filtered.bed \
+-b wgEncodeGencodeComprehensiveV36lift37_filefornested_filtered.bed \
+-F 1.0 -wo > V36lift37_overlap.bed
+
+##################
+#### MOUSE #######
+##################
+bedtools intersect -a wgEncodeGencodeCompVM25_fileforhost_filtered.bed \
+-b wgEncodeGencodeCompVM25_filefornested_filtered.bed \
+-F 1.0 -wo > VM25_overlap.bed
