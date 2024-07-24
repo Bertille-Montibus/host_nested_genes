@@ -419,6 +419,14 @@ p <- random_stdev_table_host %>% ggplot(aes(x = hn,y = stdev, fill = hn)) +
 ks_test_result <- ks.test(a$stdev, b$stdev)
 print(ks_test_result)
 
+
+# Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. < 2.2e-16
+# 2. < 2.2e-16
+# 3. < 2.2e-16
+# 4. < 2.2e-16
+# 5. < 2.2e-16
+
 # Export plot 
 pdf("plots/mouse_stdev_host_group.pdf", width =5, height = 3)
 p
@@ -441,6 +449,14 @@ p <- random_stdev_table_nested %>% ggplot(aes(x = hn,y = stdev, fill = hn)) +
 # ks.test
 ks_test_result <- ks.test(a$stdev, b$stdev)
 print(ks_test_result)
+
+
+# Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. < 2.2e-16
+# 2. < 2.2e-16
+# 3. < 2.2e-16
+# 4. < 2.2e-16
+# 5. < 2.2e-16
 
 # Export plot 
 pdf("plots/mouse_stdev_nested_group.pdf", width =5, height = 3)
@@ -490,6 +506,15 @@ plot
 ks_test_result <- ks.test(a$tau, b$tau)
 print(ks_test_result)
 
+# Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. 2.975e-06
+# 2. 0.000217
+# 3. 3.169e-08
+# 4. 1.666e-07
+# 5. 2.697e-06
+
+
+
 # EXPORT plot
 pdf("plots/mouse_tau_nested_group.pdf", width =5, height = 3)
 plot
@@ -515,6 +540,13 @@ plot
 # Kolmogorov-Smirnov Test
 ks_test_result <- ks.test(a$tau, b$tau)
 print(ks_test_result)
+
+# Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. 4.081e-13
+# 2. 2.977e-15
+# 3. 9.438e-13
+# 4. 7.885e-12
+# 5. 1.468e-13
 
 pdf("plots/mouse_tau_host_group.pdf", width =5, height = 3)
 plot
