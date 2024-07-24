@@ -434,6 +434,13 @@ p <- random_stdev_table_nested %>% ggplot(aes(x = hn,y = stdev, fill = hn)) +
 ks_test_result <- ks.test(a$stdev, b$stdev)
 print(ks_test_result)
 
+## Ran 5 times at each with seperate random samples, p-values listed ## 
+  # 1. < 2.2e-16
+  # 2. < 2.2e-16
+  # 3. < 2.2e-16
+  # 4. < 2.2e-16
+  # 5. < 2.2e-16
+
 # Export plot 
 pdf("plots/human_stdev_host_group.pdf", width =5, height = 3)
 p
@@ -456,6 +463,13 @@ p <- random_stdev_table_nested %>% ggplot(aes(x = hn,y = stdev, fill = hn)) +
 # ks.test
 ks_test_result <- ks.test(a$stdev, b$stdev)
 print(ks_test_result)
+
+## Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. < 2.2e-16
+# 2. < 2.2e-16
+# 3. < 2.2e-16
+# 4. < 2.2e-16
+# 5. < 2.2e-16
 
 # Export plot 
 pdf("plots/human_stdev_nested_group.pdf", width =5, height = 3)
@@ -509,6 +523,13 @@ plot <- random_tau_table_nested %>% filter(tau > 0) %>% ggplot(aes(x = hostornes
 ks_test_result <- ks.test(a$tau, b$tau)
 print(ks_test_result)
 
+## Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. 4.147e-16
+# 2. 3.918e-13
+# 3. 9.318e-16
+# 4. 7.164e-14
+# 5. < 2.2e-16
+
 # EXPORT plot
 pdf("plots/human_tau_nested_group.pdf", width =5, height = 3)
 plot
@@ -532,6 +553,13 @@ plot <- random_tau_table_host %>% filter(tau > 0) %>% ggplot(aes(x = hostorneste
 # Kolmogorov-Smirnov Test
 ks_test_result <- ks.test(a$tau, b$tau)
 print(ks_test_result)
+
+## Ran 5 times at each with seperate random samples, p-values listed ## 
+# 1. < 2.2e-16
+# 2. < 2.2e-16
+# 3. < 2.2e-16
+# 4. < 2.2e-16
+# 5. < 2.2e-16
 
 # Export 
 pdf("plots/human_tau_host_group.pdf", width =5, height = 3)
