@@ -1,5 +1,5 @@
 # Host_nested_genes
-This repository contains all the files and code necessary to repeat the analysis conducted in "...."
+This repository contains all the files and code necessary to repeat the analysis conducted Montibus et al, 2024 (https://www.biorxiv.org/content/10.1101/2023.05.02.539096v2)
 
 The GTF files can be found at https://figshare.com/articles/dataset/GTF_files_to_accompany_Montibus_et_al_2024/26349091
 
