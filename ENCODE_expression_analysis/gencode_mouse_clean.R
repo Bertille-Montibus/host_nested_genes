@@ -382,10 +382,14 @@ dev.off()
 
 
 
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-## -- ## -- Exploring expression data - Tissue Specificity -- ## -- ## 
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+## -- ## -- ## -- ## -- Exploring expression data - Tissue Specificity -- ## 
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
+# Master table of expression can be used to generate stdev
+# Tau index must be run again in terminal
+
+### STDEV ANALYSIS ### 
 
 # Obtaining stdev for each transcript across all datasets 
 a <- expression_bigtable %>% group_by(hn, transcript_ID) %>% summarise(stdev = log10(sd(norm_count))) %>% 
@@ -407,29 +411,51 @@ a <- stdev_table %>% filter(hn == "host") %>%
   distinct(transcript_ID, .keep_all = T) 
 b <- stdev_table %>% filter(hn == "all") %>% 
   filter(!transcript_ID %in% a$transcript_ID) %>% 
-  distinct(transcript_ID, .keep_all = T) %>% sample_n(4846) %>% 
+  distinct(transcript_ID, .keep_all = T) %>% 
   mutate(hn = "non_host_nested")
 random_stdev_table_host <- rbind(a,b)
 p <- random_stdev_table_host %>% ggplot(aes(x = hn,y = stdev, fill = hn)) + 
   geom_violin(alpha = 0.5) +
   geom_boxplot(width = 0.1) + 
   coord_flip() + bartheme + xlab("") + theme(legend.title = element_blank()) + 
-  scale_fill_manual(values = c("#1b124870","grey80")) + ggtitle("4846 genes, ks.test = < 2.2e-16")
-# ks.test
-ks_test_result <- ks.test(a$stdev, b$stdev)
-print(ks_test_result)
+  scale_fill_manual(values = c("#1b124870","grey80")) 
 
 
-# Ran 5 times at each with seperate random samples, p-values listed ## 
-# 1. < 2.2e-16
-# 2. < 2.2e-16
-# 3. < 2.2e-16
-# 4. < 2.2e-16
-# 5. < 2.2e-16
+# performing this 1000 times recording the p-value of each KS.test # 
+num_iterations <- 1000
+ks_test_results <- data.frame(iteration = numeric(num_iterations), 
+                              ks_statistic = numeric(num_iterations), 
+                              p_value = numeric(num_iterations))
+for (i in 1:num_iterations) {
+  set.seed(i)
+  sample_b <- b %>% sample_n(4846)
+  ks_test <- ks.test(a$stdev, sample_b$stdev)
+  ks_test_results$iteration[i] <- i
+  ks_test_results$ks_statistic[i] <- ks_test$statistic
+  ks_test_results$p_value[i] <- ks_test$p.value
+}
+
+# Plotting 
+ksplot <-ks_test_results %>% arrange(p_value) %>%
+  ggplot(aes(x=p_value)) + 
+  geom_boxplot() + 
+  geom_point(aes(y = 0), position = position_jitter(height = 0.05, width = 0), alpha = 0.5, color = "black") +
+  xlim(-0.01,0.1) +
+  theme_bw() +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  geom_vline(xintercept = 0.05, linetype = "dashed")+
+  xlab("Kolmogorov–Smirnov test p-value")
+ksplot
 
 # Export plot 
 pdf("plots/mouse_stdev_host_group.pdf", width =5, height = 3)
 p
+dev.off()
+
+pdf("plots/mouse_stdev_host_groupKSTEST.pdf", width =5, height = 1.5)
+ksplot
 dev.off()
 
 
@@ -438,33 +464,60 @@ a <- stdev_table %>% filter(hn == "nested") %>%
   distinct(transcript_ID, .keep_all = T) 
 b <- stdev_table %>% filter(hn == "all") %>% 
   filter(!transcript_ID %in% a$transcript_ID) %>% 
-  distinct(transcript_ID, .keep_all = T) %>% sample_n(5608) %>% 
+  distinct(transcript_ID, .keep_all = T) %>%
   mutate(hn = "non_host_nested")
 random_stdev_table_nested <- rbind(a,b)
 p <- random_stdev_table_nested %>% ggplot(aes(x = hn,y = stdev, fill = hn)) + 
   geom_violin(alpha = 0.5) +
   geom_boxplot(width = 0.1) + 
   coord_flip() + bartheme + xlab("") + theme(legend.title = element_blank()) + 
-  scale_fill_manual(values = c("#cb6082d6","grey80")) + ggtitle("5608 genes, ks.test = < 2.2e-16")
-# ks.test
-ks_test_result <- ks.test(a$stdev, b$stdev)
-print(ks_test_result)
+  scale_fill_manual(values = c("#cb6082d6","grey80")) 
 
+# performing this 1000 times recording the p-value of each KS.test # 
+num_iterations <- 1000
+ks_test_results <- data.frame(iteration = numeric(num_iterations), 
+                              ks_statistic = numeric(num_iterations), 
+                              p_value = numeric(num_iterations))
+for (i in 1:num_iterations) {
+  set.seed(i)
+  sample_b <- b %>% sample_n(5608)
+  ks_test <- ks.test(a$stdev, sample_b$stdev)
+  ks_test_results$iteration[i] <- i
+  ks_test_results$ks_statistic[i] <- ks_test$statistic
+  ks_test_results$p_value[i] <- ks_test$p.value
+}
 
-# Ran 5 times at each with seperate random samples, p-values listed ## 
-# 1. < 2.2e-16
-# 2. < 2.2e-16
-# 3. < 2.2e-16
-# 4. < 2.2e-16
-# 5. < 2.2e-16
+# Plotting 
+ksplot <-ks_test_results %>% arrange(p_value) %>%
+  ggplot(aes(x=p_value)) + 
+  geom_boxplot() + 
+  geom_point(aes(y = 0), position = position_jitter(height = 0.05, width = 0), alpha = 0.5, color = "black") +
+  xlim(-0.01,0.1) +
+  theme_bw() +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  geom_vline(xintercept = 0.05, linetype = "dashed")+
+  xlab("Kolmogorov–Smirnov test p-value")
+ksplot
 
 # Export plot 
 pdf("plots/mouse_stdev_nested_group.pdf", width =5, height = 3)
 p
 dev.off()
 
+pdf("plots/mouse_stdev_nested_groupKSTEST.pdf", width =5, height = 1.5)
+ksplot
+dev.off()
 
-# Generation of Tau specificty table 
+
+### ### ### ### ### ### 
+### Tau analysis ###
+### ### ### ### ### ### 
+
+
+# Generation of Tissue specificity Table
+# Updating the code for Tau not zero 
 x <- as.data.frame(read_tsv("tau.tsv"))
 colnames(x) <- c("ENST", "tau")
 x$ENST <- gsub("\\..*","",x$ENST)
@@ -483,75 +536,128 @@ x$pairid <- "blank"
 x$SYMBOL <- "blank"
 head(x)
 tau_table <- rbind(tau_table,x)
+# remove pair ID and unique()
+# Checking number of unique colums 
+tau_table %>% filter(hostornested == "nested") %>% select(-pairid) %>% unique() %>% nrow()
+tau_table %>% filter(hostornested == "host") %>% select(-pairid) %>% unique() %>% nrow()
+tau_table %>% filter(hostornested == "all_genes") %>% nrow()
+filtered_tau_table <- tau_table %>% select(-pairid) %>% unique()
+# Tau == 0 means the gene is expressed in NO TISSUES at all 
+# Whereas the stdev calculation removes these valuses
+# Attempt plot and remove 0 value 
+b <- filtered_tau_table %>% filter(tau > 0) %>% ggplot(aes(x = hostornested,y = tau, fill = hostornested)) + 
+  geom_violin(alpha = 0.5) +
+  geom_boxplot(width = 0.1) + 
+  coord_flip() + bartheme + xlab("") + theme(legend.title = element_blank()) + 
+  scale_fill_manual(values = c("#fbe4afd6","#1b124870", "#cb6082d6")) 
+
+
 
 # Comparing tau with random matched sample numbers #
-  # Nested genes 
+
+# Matching nested numbers, independent samples met 
 a <- tau_table %>% filter(hostornested == "nested") %>% 
   distinct(ENST, .keep_all = T) 
 b <- tau_table %>% filter(hostornested == "all_genes") %>% 
   filter(!SYMBOL %in% a$SYMBOL) %>% 
-  distinct(ENST, .keep_all = T) %>% sample_n(5595) %>% 
+  distinct(ENST, .keep_all = T) %>% 
   mutate(hostornested = "non_host_nested")
 random_tau_table_nested <- rbind(a,b)
-
 # Plotting 
 plot <- random_tau_table_nested %>% filter(tau > 0) %>% ggplot(aes(x = hostornested,y = tau, fill = hostornested)) + 
   geom_violin(alpha = 0.5) +
   geom_boxplot(width = 0.1) + 
   coord_flip() + bartheme + xlab("") + theme(legend.title = element_blank()) + 
-  scale_fill_manual(values = c("#cb6082d6","grey80")) + ggtitle("5,595 genes, ks.test = 2.975e-06")
+  scale_fill_manual(values = c("#cb6082d6","grey80")) 
 plot
 
-# Kolmogorov-Smirnov Test - relevant for independent samples (host/non-host)
-ks_test_result <- ks.test(a$tau, b$tau)
-print(ks_test_result)
+# performing this 1000 times recording the p-value of each KS.test # 
+num_iterations <- 1000
+ks_test_results <- data.frame(iteration = numeric(num_iterations), 
+                              ks_statistic = numeric(num_iterations), 
+                              p_value = numeric(num_iterations))
+for (i in 1:num_iterations) {
+  set.seed(i)
+  sample_b <- b %>% sample_n(5595)
+  ks_test <- ks.test(a$tau, sample_b$tau)
+  ks_test_results$iteration[i] <- i
+  ks_test_results$ks_statistic[i] <- ks_test$statistic
+  ks_test_results$p_value[i] <- ks_test$p.value
+}
 
-# Ran 5 times at each with seperate random samples, p-values listed ## 
-# 1. 2.975e-06
-# 2. 0.000217
-# 3. 3.169e-08
-# 4. 1.666e-07
-# 5. 2.697e-06
-
-
+# Plotting 
+ksplot <-ks_test_results %>% arrange(p_value) %>%
+  ggplot(aes(x=p_value)) + 
+  geom_boxplot() + 
+  geom_point(aes(y = 0), position = position_jitter(height = 0.05, width = 0), alpha = 0.5, color = "black") +
+  xlim(-0.01,0.1) +
+  theme_bw() +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  geom_vline(xintercept = 0.05, linetype = "dashed")+
+  xlab("Kolmogorov–Smirnov test p-value")
+ksplot
 
 # EXPORT plot
 pdf("plots/mouse_tau_nested_group.pdf", width =5, height = 3)
 plot
 dev.off()
+pdf("plots/mouse_tau_nested_groupKSTEST.pdf", width =5, height = 1.5)
+ksplot
+dev.off()
 
 
-  # Host genes 
+# Repeat analysis for host genes 
 a <- tau_table %>% filter(hostornested == "host") %>% 
   distinct(ENST, .keep_all = T) 
 b <- tau_table %>% filter(hostornested == "all_genes") %>% 
-  distinct(ENST, .keep_all = T) %>% sample_n(4097) %>% 
+  distinct(ENST, .keep_all = T) %>% 
   mutate(hostornested = "non_host_nested")
 random_tau_table_host <- rbind(a,b)
-
 # Plotting 
 plot <- random_tau_table_host %>% filter(tau > 0) %>% ggplot(aes(x = hostornested,y = tau, fill = hostornested)) + 
   geom_violin(alpha = 0.5) +
   geom_boxplot(width = 0.1) + 
   coord_flip() + bartheme + xlab("") + theme(legend.title = element_blank()) + 
-  scale_fill_manual(values = c("#1b124870","grey80")) + ggtitle("4,097 genes, ks.test = 4.081e-13")
-plot
+  scale_fill_manual(values = c("#1b124870","grey80")) 
 
-# Kolmogorov-Smirnov Test
-ks_test_result <- ks.test(a$tau, b$tau)
-print(ks_test_result)
 
-# Ran 5 times at each with seperate random samples, p-values listed ## 
-# 1. 4.081e-13
-# 2. 2.977e-15
-# 3. 9.438e-13
-# 4. 7.885e-12
-# 5. 1.468e-13
+# performing this 1000 times recording the p-value of each KS.test # 
+num_iterations <- 1000
+ks_test_results <- data.frame(iteration = numeric(num_iterations), 
+                              ks_statistic = numeric(num_iterations), 
+                              p_value = numeric(num_iterations))
+for (i in 1:num_iterations) {
+  set.seed(i)
+  sample_b <- b %>% sample_n(4097)
+  ks_test <- ks.test(a$tau, sample_b$tau)
+  ks_test_results$iteration[i] <- i
+  ks_test_results$ks_statistic[i] <- ks_test$statistic
+  ks_test_results$p_value[i] <- ks_test$p.value
+}
+
+# Plotting 
+ksplot <-ks_test_results %>% arrange(p_value) %>%
+  ggplot(aes(x=p_value)) + 
+  geom_boxplot() + 
+  geom_point(aes(y = 0), position = position_jitter(height = 0.05, width = 0), alpha = 0.5, color = "black") +
+  xlim(-0.01,0.1) +
+  theme_bw() +
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()) +
+  geom_vline(xintercept = 0.05, linetype = "dashed")+
+  xlab("Kolmogorov–Smirnov test p-value")
+ksplot
 
 pdf("plots/mouse_tau_host_group.pdf", width =5, height = 3)
 plot
 dev.off()
 
+pdf("plots/mouse_tau_host_groupKSTEST.pdf", width =5, height = 1.5)
+ksplot
+dev.off()
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
