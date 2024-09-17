@@ -72,6 +72,7 @@ ggplot(hn_gencode, aes(x=Nested_size, y=Host_size)) +
   scale_y_continuous(trans='log10') +
   stat_density_2d(aes(fill = ..level..), geom="polygon")+
   scale_fill_viridis(alpha = 0.3,option = "C")+
+  geom_smooth(method='lm', formula= y~x, color = "grey")+
   labs(title="Correlation_host_nested_size_Human",x="Nested_gene_size", y = "Host_gene_size")
 
 #Correlation analysis - Test of the data normality
@@ -165,6 +166,7 @@ ggplot(hn_gencode, aes(x=Nested_size, y=Host_size)) +
   scale_y_continuous(trans='log10') +
   stat_density_2d(aes(fill = ..level..), geom="polygon")+
   scale_fill_viridis(alpha = 0.3,option = "C")+
+  geom_smooth(method='lm', formula= y~x, color = "grey")+
   labs(title="Correlation_host_nested_size_Mouse",x="Nested_gene_size", y = "Host_gene_size")
 
 #Correlation analysis - Test of the data normality
